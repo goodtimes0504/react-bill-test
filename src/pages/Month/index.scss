@@ -59,6 +59,11 @@
         }
       }
     }
+
+    /* 添加这些属性来优化触摸滚动 */
+    -webkit-overflow-scrolling: touch; /* 启用弹性滚动 */
+    overscroll-behavior: contain; /* 防止滚动传播 */
+    touch-action: pan-y; /* 允许垂直平移 */
   }
   .twoLineOverview {
     display: flex;
