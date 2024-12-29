@@ -6,7 +6,8 @@ import classNames from "classnames";
 const Month = () => {
   //控制弹窗的打开和关闭
   const [dateVisible, setDateVisible] = useState(false);
-  const [date, setDate] = useState(new Date());
+  // const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(() => new Date());
 
   const onConfirm = (val) => {
     setDate(val);
@@ -22,7 +23,9 @@ const Month = () => {
         <div className="header">
           {/* 时间切换区域 */}
           <div className="date" onClick={() => setDateVisible(true)}>
-            <span className="text">2023 | 3月账单</span>
+            <span className="text">
+              {date.getFullYear()} | {date.getMonth() + 1}月账单
+            </span>
             {/* 根据当前弹窗打开状态控制expand类名 */}
             <span
               className={classNames("arrow", dateVisible && "expand")}
