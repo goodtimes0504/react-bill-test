@@ -1,6 +1,6 @@
 import { NavBar, DatePicker } from "antd-mobile";
 import "./index.scss";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import classNames from "classnames";
 import { useSelector } from "react-redux";
 import _ from "lodash";
@@ -12,16 +12,45 @@ const Month = () => {
   const monthGroup = useMemo(() => {
     return _.groupBy(billList, (item) => dayjs(item.date).format("YYYY-MM"));
   }, [billList]);
-  console.log(monthGroup);
   //控制弹窗的打开和关闭
   const [dateVisible, setDateVisible] = useState(false);
-  // const [date, setDate] = useState(new Date());
+  // 存储展示的月份
+  const [currentMonth, setCurrentMonth] = useState(() =>
+    dayjs().format("YYYY-MM")
+  );
+  // 存储选择器的日期对象
   const [date, setDate] = useState(() => new Date());
+  // 存储当前月份的账单
+  const [currentMonthBill, setCurrentMonthBill] = useState([]);
 
   const onConfirm = (val) => {
-    setDate(val);
     setDateVisible(false);
+    const formattedMonth = dayjs(val).format("YYYY-MM");
+
+    // 1. 先获取数据
+    const monthBills = monthGroup[formattedMonth] || [];
+
+    // 2. 更新状态
+    setCurrentMonth(formattedMonth);
+    setCurrentMonthBill(monthBills);
+
+    setDate(val);
   };
+  const monthResult = useMemo(() => {
+    const pay = currentMonthBill
+      .filter((item) => item.type === "pay")
+      .reduce((sum, item) => sum + item.money, 0);
+    const income = currentMonthBill
+      .filter((item) => item.type === "income")
+      .reduce((sum, item) => sum + item.money, 0);
+    const balance = income + pay;
+    return { pay, income, balance };
+  }, [currentMonthBill]);
+  useEffect(() => {
+    console.log("当前月份:", currentMonth);
+    console.log("当前月份账单:", currentMonthBill);
+    console.log("月度结果:", monthResult);
+  }, [currentMonth, currentMonthBill, monthResult]);
 
   return (
     <div className="monthlyBill">
@@ -32,9 +61,7 @@ const Month = () => {
         <div className="header">
           {/* 时间切换区域 */}
           <div className="date" onClick={() => setDateVisible(true)}>
-            <span className="text">
-              {date.getFullYear()} | {date.getMonth() + 1}月账单
-            </span>
+            <span className="text">{currentMonth}月账单</span>
             {/* 根据当前弹窗打开状态控制expand类名 */}
             <span
               className={classNames("arrow", dateVisible && "expand")}
@@ -43,15 +70,15 @@ const Month = () => {
           {/* 统计区域 */}
           <div className="twoLineOverview">
             <div className="item">
-              <span className="money">{100}</span>
+              <span className="money">{monthResult.pay.toFixed(2)}</span>
               <span className="type">支出</span>
             </div>
             <div className="item">
-              <span className="money">{200}</span>
+              <span className="money">{monthResult.income.toFixed(2)}</span>
               <span className="type">收入</span>
             </div>
             <div className="item">
-              <span className="money">{200}</span>
+              <span className="money">{monthResult.balance.toFixed(2)}</span>
               <span className="type">结余</span>
             </div>
           </div>
