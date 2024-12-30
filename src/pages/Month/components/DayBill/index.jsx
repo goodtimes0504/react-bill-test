@@ -1,6 +1,6 @@
 import classNames from "classnames"
 import "./index.scss"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { billTypeToName } from "@/contents"
 
 // eslint-disable-next-line react/prop-types
@@ -15,12 +15,17 @@ const DailyBill = ({ date, billList }) => {
     const balance = income + pay
     return { pay, income, balance }
   }, [billList])
+  //控制展开收起
+  const [visible, setVisible] = useState(false)
   return (
     <div className={classNames("dailyBill")}>
       <div className="header">
         <div className="dateIcon">
           <span className="date">{date}</span>
-          <span className={classNames("arrow")}></span>
+          <span
+            className={classNames("arrow", { expand: visible })}
+            onClick={() => setVisible(!visible)}
+          ></span>
         </div>
         <div className="oneLineOverview">
           <div className="pay">
@@ -38,7 +43,7 @@ const DailyBill = ({ date, billList }) => {
         </div>
       </div>
       {/* 单日列表 */}
-      <div className="billList">
+      <div className="billList" style={{ display: visible ? "block" : "none" }}>
         {billList.map((item) => {
           return (
             <div className="bill" key={item.id}>
