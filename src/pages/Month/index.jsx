@@ -1,56 +1,56 @@
-import { NavBar, DatePicker } from "antd-mobile";
-import "./index.scss";
-import { useEffect, useMemo, useState } from "react";
-import classNames from "classnames";
-import { useSelector } from "react-redux";
-import _ from "lodash";
-import dayjs from "dayjs";
+import { NavBar, DatePicker } from "antd-mobile"
+import "./index.scss"
+import { useEffect, useMemo, useState } from "react"
+import classNames from "classnames"
+import { useSelector } from "react-redux"
+import _ from "lodash"
+import dayjs from "dayjs"
 
 const Month = () => {
   //按月做数据的分组
-  const billList = useSelector((state) => state.bill.billList);
+  const billList = useSelector((state) => state.bill.billList)
   const monthGroup = useMemo(() => {
-    return _.groupBy(billList, (item) => dayjs(item.date).format("YYYY-MM"));
-  }, [billList]);
+    return _.groupBy(billList, (item) => dayjs(item.date).format("YYYY-MM"))
+  }, [billList])
   //控制弹窗的打开和关闭
-  const [dateVisible, setDateVisible] = useState(false);
+  const [dateVisible, setDateVisible] = useState(false)
   // 存储展示的月份
   const [currentMonth, setCurrentMonth] = useState(() =>
     dayjs().format("YYYY-MM")
-  );
+  )
   // 存储选择器的日期对象
-  const [date, setDate] = useState(() => new Date());
+  const [date, setDate] = useState(() => new Date())
   // 存储当前月份的账单
-  const [currentMonthBill, setCurrentMonthBill] = useState([]);
+  const [currentMonthBill, setCurrentMonthBill] = useState([])
 
   const onConfirm = (val) => {
-    setDateVisible(false);
-    const formattedMonth = dayjs(val).format("YYYY-MM");
+    setDateVisible(false)
+    const formattedMonth = dayjs(val).format("YYYY-MM")
 
     // 1. 先获取数据
-    const monthBills = monthGroup[formattedMonth] || [];
+    const monthBills = monthGroup[formattedMonth] || []
 
     // 2. 更新状态
-    setCurrentMonth(formattedMonth);
-    setCurrentMonthBill(monthBills);
+    setCurrentMonth(formattedMonth)
+    setCurrentMonthBill(monthBills)
 
-    setDate(val);
-  };
+    setDate(val)
+  }
   const monthResult = useMemo(() => {
     const pay = currentMonthBill
       .filter((item) => item.type === "pay")
-      .reduce((sum, item) => sum + item.money, 0);
+      .reduce((sum, item) => sum + item.money, 0)
     const income = currentMonthBill
       .filter((item) => item.type === "income")
-      .reduce((sum, item) => sum + item.money, 0);
-    const balance = income + pay;
-    return { pay, income, balance };
-  }, [currentMonthBill]);
+      .reduce((sum, item) => sum + item.money, 0)
+    const balance = income + pay
+    return { pay, income, balance }
+  }, [currentMonthBill])
+  //初始化的时候把当前月的数据显示出来
   useEffect(() => {
-    console.log("当前月份:", currentMonth);
-    console.log("当前月份账单:", currentMonthBill);
-    console.log("月度结果:", monthResult);
-  }, [currentMonth, currentMonthBill, monthResult]);
+    const nowDate = dayjs().format("YYYY-MM")
+    setCurrentMonthBill(monthGroup[nowDate] || [])
+  }, [monthGroup])
 
   return (
     <div className="monthlyBill">
@@ -96,7 +96,7 @@ const Month = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Month;
+export default Month
