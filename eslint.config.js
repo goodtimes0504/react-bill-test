@@ -34,6 +34,7 @@ export default [
         { allowConstantExport: true },
       ],
       // semi: ["error", "never"], // 禁止使用分号
+      "react/prop-types": "off",
     },
   },
 ]

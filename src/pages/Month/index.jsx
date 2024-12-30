@@ -5,6 +5,8 @@ import classNames from "classnames"
 import { useSelector } from "react-redux"
 import _ from "lodash"
 import dayjs from "dayjs"
+//引入按日期显示账单组件
+import DailyBill from "./components/DayBill/index.jsx"
 
 const Month = () => {
   //按月做数据的分组
@@ -22,6 +24,18 @@ const Month = () => {
   const [date, setDate] = useState(() => new Date())
   // 存储当前月份的账单
   const [currentMonthBill, setCurrentMonthBill] = useState([])
+  //当前月按照日期分组后的账单
+  // const [currentDayBill, setCurrentDayBill] = useState([])
+  const dayGroup = useMemo(() => {
+    const groupData = _.groupBy(currentMonthBill, (item) =>
+      dayjs(item.date).format("YYYY-MM-DD")
+    )
+    const keys = Object.keys(groupData)
+    return {
+      keys,
+      groupData,
+    }
+  }, [currentMonthBill])
 
   const onConfirm = (val) => {
     setDateVisible(false)
@@ -94,6 +108,16 @@ const Month = () => {
             max={new Date()}
           />
         </div>
+        {/* 按日期显示账单 */}
+        {dayGroup.keys.map((key) => {
+          return (
+            <DailyBill
+              date={key}
+              billList={dayGroup.groupData[key]}
+              key={key}
+            />
+          )
+        })}
       </div>
     </div>
   )
